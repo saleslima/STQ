@@ -452,9 +452,45 @@ window.enviarEmail = function() {
     window.location.href = mailtoLink;
 }
 
+// Senha para acesso ao sistema
+const SENHA_SISTEMA = 'mystq';
+
 // Inicializar
 document.addEventListener('DOMContentLoaded', function() {
-    carregarQuestoesFirebase(); // Carregar questões antes de renderizar
+    // Verificar se já está autenticado
+    const isAuthenticated = sessionStorage.getItem('authenticated') === 'true';
+    
+    if (isAuthenticated) {
+        mostrarAplicacao();
+    } else {
+        mostrarTelaLogin();
+    }
+    
+    // Event listener para login
+    const btnLogin = document.getElementById('btnLogin');
+    const loginPassword = document.getElementById('loginPassword');
+    
+    btnLogin.addEventListener('click', verificarSenhaLogin);
+    
+    loginPassword.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            verificarSenhaLogin();
+        }
+    });
+});
+
+function mostrarTelaLogin() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('loginPassword').focus();
+}
+
+function mostrarAplicacao() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    
+    // Inicializar todos os componentes
+    carregarQuestoesFirebase();
     
     document.getElementById('gerarResultado').addEventListener('click', calcularResultado);
     
@@ -479,15 +515,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializar gerenciador de questões
     initGerenciadorQuestoes();
     
-    // Inicializar tabs
-    initTabs();
-    
     // Inicializar dark mode
     initDarkMode();
     
     // Inicializar E-selotex
     initEselotex();
-});
+}
+
+function verificarSenhaLogin() {
+    const senhaDigitada = document.getElementById('loginPassword').value;
+    const loginError = document.getElementById('loginError');
+    
+    if (senhaDigitada === SENHA_SISTEMA) {
+        sessionStorage.setItem('authenticated', 'true');
+        loginError.textContent = '';
+        mostrarAplicacao();
+    } else {
+        loginError.textContent = 'Senha incorreta! Tente novamente.';
+        document.getElementById('loginPassword').value = '';
+        document.getElementById('loginPassword').focus();
+    }
+}
 
 // Dark Mode
 function initDarkMode() {
@@ -529,6 +577,9 @@ const cadastros = {
 function initCadastros() {
     const modal = document.getElementById('modalCadastros');
     const btnCadastros = document.getElementById('btnCadastros');
+    const btnQuestoes = document.getElementById('btnQuestoes');
+    const btnEselotex = document.getElementById('btnEselotex');
+    const btnEscalaObs = document.getElementById('btnEscalaObs');
     const closeBtn = document.querySelector('.close');
     const tipoCadastroSelect = document.getElementById('tipoCadastro');
     const categoriaCadastroSelect = document.getElementById('categoriaCadastro');
@@ -539,12 +590,58 @@ function initCadastros() {
     // Carregar cadastros do Firebase
     carregarCadastrosFirebase();
 
-    // Abrir modal
+    // Abrir modal com diferentes conteúdos
     btnCadastros.addEventListener('click', function() {
-        modal.style.display = 'block';
-        atualizarListaCadastros();
-        renderizarListaQuestoes();
+        abrirModal('Cadastros', 'tabPessoas');
+        setActiveNavButton(this);
     });
+
+    btnQuestoes.addEventListener('click', function() {
+        abrirModal('Questões', 'tabQuestoes');
+        setActiveNavButton(this);
+    });
+
+    btnEselotex.addEventListener('click', function() {
+        abrirModal('E-selotex', 'tabEselotex');
+        setActiveNavButton(this);
+    });
+
+    btnEscalaObs.addEventListener('click', function() {
+        abrirModal('Escala Obs', 'tabEscalaObs');
+        setActiveNavButton(this);
+    });
+
+    function abrirModal(titulo, tabId) {
+        document.getElementById('modalTitle').textContent = titulo;
+        
+        // Esconder todas as tabs
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        // Mostrar tab selecionada
+        document.getElementById(tabId).classList.add('active');
+        
+        modal.style.display = 'block';
+        
+        // Renderizar conteúdo apropriado
+        if (tabId === 'tabPessoas') {
+            atualizarListaCadastros();
+        } else if (tabId === 'tabQuestoes') {
+            renderizarListaQuestoes();
+        } else if (tabId === 'tabEselotex') {
+            renderizarCalendario();
+        } else if (tabId === 'tabEscalaObs') {
+            renderizarCalendarioEscala();
+        }
+    }
+
+    function setActiveNavButton(activeBtn) {
+        document.querySelectorAll('.btn-nav').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        activeBtn.classList.add('active');
+    }
 
     // Fechar modal
     closeBtn.addEventListener('click', function() {
@@ -1047,34 +1144,7 @@ function initGerenciadorQuestoes() {
 }
 
 function initTabs() {
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tabName = this.dataset.tab;
-            
-            // Remover active de todos os botões e conteúdos
-            tabBtns.forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // Adicionar active ao botão clicado e seu conteúdo
-            this.classList.add('active');
-            if (tabName === 'pessoas') {
-                document.getElementById('tabPessoas').classList.add('active');
-            } else if (tabName === 'questoes') {
-                document.getElementById('tabQuestoes').classList.add('active');
-                renderizarListaQuestoes();
-            } else if (tabName === 'eselotex') {
-                document.getElementById('tabEselotex').classList.add('active');
-                renderizarCalendario();
-            } else if (tabName === 'escalaobs') {
-                document.getElementById('tabEscalaObs').classList.add('active');
-                renderizarCalendarioEscala();
-            }
-        });
-    });
+    // Tabs agora são controladas pelos botões principais, não necessário mais
 }
 
 function carregarQuestoesFirebase() {
@@ -1217,6 +1287,9 @@ const observacoesEscala = {};
 let escalaObsAuthenticated = false;
 const SENHA_ESCALA = 'mystq';
 
+let tipoListaAtual = null;
+let dataReferenciaListaAtual = null;
+
 function initEselotex() {
     carregarObservacoesFirebase();
     
@@ -1228,6 +1301,10 @@ function initEselotex() {
     document.getElementById('nextMonth').addEventListener('click', () => {
         currentDate.setMonth(currentDate.getMonth() + 1);
         renderizarCalendario();
+    });
+    
+    document.getElementById('btnListarEselotex').addEventListener('click', () => {
+        listarObservacoesMes('eselotex', currentDate);
     });
     
     // Modal de observação
@@ -1264,6 +1341,10 @@ function initEscalaObs() {
     document.getElementById('nextMonthEscala').addEventListener('click', () => {
         currentDateEscala.setMonth(currentDateEscala.getMonth() + 1);
         renderizarCalendarioEscala();
+    });
+    
+    document.getElementById('btnListarEscalaObs').addEventListener('click', () => {
+        listarObservacoesMes('escalaobs', currentDateEscala);
     });
     
     // Modal de observação Escala
@@ -1660,4 +1741,164 @@ function carregarObservacoesEscalaFirebase() {
         
         renderizarCalendarioEscala();
     });
+}
+
+function listarObservacoesMes(tipo, dataReferencia) {
+    tipoListaAtual = tipo;
+    dataReferenciaListaAtual = dataReferencia;
+    
+    const modal = document.getElementById('modalListaObservacoes');
+    const titulo = document.getElementById('tituloListaObservacoes');
+    const conteudo = document.getElementById('conteudoListaObservacoes');
+    const closeBtn = document.getElementById('closeListaObservacoes');
+    
+    const year = dataReferencia.getFullYear();
+    const month = dataReferencia.getMonth();
+    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    
+    titulo.textContent = `Observações - ${monthNames[month]} de ${year}`;
+    
+    // Obter observações do mês
+    const observacoesDoMes = tipo === 'eselotex' ? observacoes : observacoesEscala;
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    
+    let htmlContent = '';
+    let temObservacoes = false;
+    
+    for (let day = 1; day <= lastDay; day++) {
+        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        if (observacoesDoMes[dateKey]) {
+            temObservacoes = true;
+            htmlContent += `
+                <div class="observacao-mes-item">
+                    <strong>Dia ${day} - ${monthNames[month]} de ${year}</strong>
+                    <div class="observacao-mes-texto">${observacoesDoMes[dateKey]}</div>
+                </div>
+            `;
+        }
+    }
+    
+    if (!temObservacoes) {
+        htmlContent = '<div class="observacao-mes-vazia">Nenhuma observação registrada para este mês.</div>';
+    }
+    
+    conteudo.innerHTML = htmlContent;
+    modal.style.display = 'block';
+    
+    // Fechar modal
+    closeBtn.onclick = () => {
+        modal.style.display = 'none';
+    };
+    
+    window.onclick = (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+}
+
+window.baixarListaObservacoesPDF = function() {
+    if (!tipoListaAtual || !dataReferenciaListaAtual) return;
+    
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    const year = dataReferenciaListaAtual.getFullYear();
+    const month = dataReferenciaListaAtual.getMonth();
+    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    
+    const tituloTipo = tipoListaAtual === 'eselotex' ? 'E-SELOTEX' : 'ESCALA OBS';
+    const observacoesDoMes = tipoListaAtual === 'eselotex' ? observacoes : observacoesEscala;
+    
+    let yPosition = 20;
+    const lineHeight = 7;
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 20;
+    const maxWidth = pageWidth - (margin * 2);
+    
+    // Título
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text(`${tituloTipo} - ${monthNames[month].toUpperCase()} ${year}`, pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 15;
+    
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'normal');
+    
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    let temObservacoes = false;
+    
+    for (let day = 1; day <= lastDay; day++) {
+        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        if (observacoesDoMes[dateKey]) {
+            temObservacoes = true;
+            
+            // Verificar se precisa de nova página
+            if (yPosition > 260) {
+                doc.addPage();
+                yPosition = 20;
+            }
+            
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(12);
+            doc.text(`Dia ${day} - ${monthNames[month]} de ${year}`, margin, yPosition);
+            yPosition += lineHeight + 2;
+            
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            const obsLines = doc.splitTextToSize(observacoesDoMes[dateKey], maxWidth);
+            doc.text(obsLines, margin, yPosition);
+            yPosition += (obsLines.length * lineHeight) + 5;
+        }
+    }
+    
+    if (!temObservacoes) {
+        doc.text('Nenhuma observação registrada para este mês.', margin, yPosition);
+    }
+    
+    doc.save(`${tituloTipo.toLowerCase().replace('-', '_')}_${monthNames[month]}_${year}.pdf`);
+}
+
+window.compartilharListaObservacoes = function(tipo) {
+    if (!tipoListaAtual || !dataReferenciaListaAtual) return;
+    
+    const year = dataReferenciaListaAtual.getFullYear();
+    const month = dataReferenciaListaAtual.getMonth();
+    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    
+    const tituloTipo = tipoListaAtual === 'eselotex' ? 'E-SELOTEX' : 'ESCALA OBS';
+    const observacoesDoMes = tipoListaAtual === 'eselotex' ? observacoes : observacoesEscala;
+    
+    let texto = `${tituloTipo} - ${monthNames[month].toUpperCase()} ${year}\n\n`;
+    
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    let temObservacoes = false;
+    
+    for (let day = 1; day <= lastDay; day++) {
+        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        if (observacoesDoMes[dateKey]) {
+            temObservacoes = true;
+            texto += `📅 Dia ${day} - ${monthNames[month]} de ${year}\n`;
+            texto += `${observacoesDoMes[dateKey]}\n\n`;
+        }
+    }
+    
+    if (!temObservacoes) {
+        texto += 'Nenhuma observação registrada para este mês.';
+    }
+    
+    if (tipo === 'email') {
+        const assunto = `${tituloTipo} - ${monthNames[month]} ${year}`;
+        const mailtoLink = `mailto:?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(texto)}`;
+        window.location.href = mailtoLink;
+    } else if (tipo === 'whatsapp') {
+        const whatsappLink = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+        window.open(whatsappLink, '_blank');
+    }
 }

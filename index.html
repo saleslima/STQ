@@ -5,285 +5,330 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulário de Avaliação</title>
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    
+    <!-- Ícone padrão -->
+    <link rel="icon" href="logo.png" type="image/png">
+    
+    <!-- Ícone para iPhone/iPad -->
+    <link rel="apple-touch-icon" href="logo.png">
+    
+    <!-- Permitir modo app em iPhone -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="STQ">
 </head>
 <body>
-    <div class="container">
-        <div class="header-wrapper">
-            <div class="logo-title">
-                <img src="logo.png" alt="Logo" class="logo">
-                <h1>Formulário de Avaliação</h1>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <img src="logo.png" alt="Logo" class="login-logo">
+            <h1>Sistema de Avaliação</h1>
+            <p>Digite a senha para acessar</p>
+            <div class="login-form">
+                <input type="password" id="loginPassword" placeholder="Digite a senha" autocomplete="off">
+                <button id="btnLogin" class="btn-primary">Entrar</button>
+                <div id="loginError" class="login-error"></div>
             </div>
-            <button class="dark-mode-toggle" id="darkModeToggle">
-                <span id="darkModeIcon">🌙</span>
-                <span id="darkModeText">Modo Escuro</span>
-            </button>
-        </div>
-        
-        <button type="button" id="btnCadastros" class="btn-secondary">Cadastros</button>
-        
-        <form id="evaluationForm">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="dataAvaliacao">Data Avaliação:</label>
-                    <input type="date" id="dataAvaliacao" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="dataAudio">Data Áudio:</label>
-                    <input type="date" id="dataAudio" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="nomeAudio">Nome do Áudio:</label>
-                    <input type="text" id="nomeAudio" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="nomeAvaliador">Nome Avaliador:</label>
-                <input type="text" id="nomeAvaliador" required autocomplete="off">
-                <div id="autocompleteAvaliador" class="autocomplete-dropdown"></div>
-            </div>
-
-            <div class="form-group">
-                <label for="nomeAvaliado">Nome Avaliado:</label>
-                <input type="text" id="nomeAvaliado" required autocomplete="off">
-                <div id="autocompleteAvaliado" class="autocomplete-dropdown"></div>
-            </div>
-
-            <div class="questions-section">
-                <h2>Questões</h2>
-                <div id="questionsContainer"></div>
-            </div>
-
-            <div class="form-group">
-                <label for="observacao">Observação:</label>
-                <textarea id="observacao" rows="4"></textarea>
-            </div>
-
-            <button type="button" id="gerarResultado" class="btn-primary">Gerar Resultado</button>
-        </form>
-
-        <div id="resultadoSection" class="resultado-section" style="display: none;">
-            <h2>Resultado da Avaliação</h2>
-            <div id="resultadoContent"></div>
         </div>
     </div>
 
-    <div id="modalCadastros" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Cadastros</h2>
-            
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="pessoas">Pessoas</button>
-                <button class="tab-btn" data-tab="questoes">Questões</button>
-                <button class="tab-btn" data-tab="eselotex">E-selotex</button>
-                <button class="tab-btn" data-tab="escalaobs">Escala Obs</button>
+    <!-- Main Application (hidden by default) -->
+    <div id="mainApp" style="display: none;">
+        <div class="container">
+            <div class="header-wrapper">
+                <div class="logo-title">
+                    <img src="logo.png" alt="Logo" class="logo">
+                    <h1>Formulário de Avaliação</h1>
+                </div>
+                <button class="dark-mode-toggle" id="darkModeToggle">
+                    <span id="darkModeIcon">🌙</span>
+                    <span id="darkModeText">Modo Escuro</span>
+                </button>
             </div>
-
-            <div id="tabPessoas" class="tab-content active">
-                <form id="formCadastro">
+            
+            <div class="main-nav-buttons">
+                <button type="button" id="btnCadastros" class="btn-nav active">Cadastros</button>
+                <button type="button" id="btnQuestoes" class="btn-nav">Questões</button>
+                <button type="button" id="btnEselotex" class="btn-nav">E-selotex</button>
+                <button type="button" id="btnEscalaObs" class="btn-nav">Escala Obs</button>
+            </div>
+            
+            <form id="evaluationForm">
+                <div class="form-row">
                     <div class="form-group">
-                        <label for="tipoCadastro">Tipo:</label>
-                        <select id="tipoCadastro" required>
-                            <option value="">Selecione...</option>
-                            <option value="avaliador">Avaliador</option>
-                            <option value="avaliado">Avaliado</option>
-                        </select>
+                        <label for="dataAvaliacao">Data Avaliação:</label>
+                        <input type="date" id="dataAvaliacao" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="categoriaCadastro">Categoria:</label>
-                        <select id="categoriaCadastro" required>
-                            <option value="">Selecione...</option>
-                            <option value="militar">Militar</option>
-                            <option value="civil">Civil</option>
-                        </select>
+                        <label for="dataAudio">Data Áudio:</label>
+                        <input type="date" id="dataAudio" required>
                     </div>
 
-                    <div id="camposMilitar" style="display: none;">
-                        <div class="form-group">
-                            <label for="postoGraduacao">Posto/Graduação:</label>
-                            <select id="postoGraduacao">
-                                <option value="">Selecione...</option>
-                                <option value="Cel PM">Cel PM</option>
-                                <option value="Ten Cel PM">Ten Cel PM</option>
-                                <option value="Maj PM">Maj PM</option>
-                                <option value="Cap PM">Cap PM</option>
-                                <option value="1º Ten PM">1º Ten PM</option>
-                                <option value="2º Ten PM">2º Ten PM</option>
-                                <option value="Asp Of PM">Asp Of PM</option>
-                                <option value="Sub Ten PM">Sub Ten PM</option>
-                                <option value="1º Sgt PM">1º Sgt PM</option>
-                                <option value="2º Sgt PM">2º Sgt PM</option>
-                                <option value="3º Sgt PM">3º Sgt PM</option>
-                                <option value="Cb PM">Cb PM</option>
-                                <option value="Sd PM 1ª Classe">Sd PM 1ª Classe</option>
-                                <option value="Sd PM 2ª Classe">Sd PM 2ª Classe</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="re">RE:</label>
-                            <input type="text" id="re">
-                        </div>
-                        <div class="form-group">
-                            <label for="nomeGuerra">Nome de Guerra:</label>
-                            <input type="text" id="nomeGuerra">
-                        </div>
-                    </div>
-
-                    <div id="camposCivil" style="display: none;">
-                        <div class="form-group">
-                            <label for="cpf">CPF:</label>
-                            <input type="text" id="cpf" placeholder="000.000.000-00">
-                        </div>
-                        <div class="form-group">
-                            <label for="nomeCompleto">Nome Completo:</label>
-                            <input type="text" id="nomeCompleto">
-                        </div>
-                    </div>
-
-                    <button type="button" id="btnSalvarCadastro" class="btn-primary">Salvar Cadastro</button>
-                </form>
-
-                <div id="listaCadastros" style="margin-top: 30px;">
-                    <h3>Buscar Cadastros</h3>
-                    <div class="search-section">
-                        <div class="form-group">
-                            <label for="searchType">Buscar por:</label>
-                            <select id="searchType">
-                                <option value="re">RE</option>
-                                <option value="cpf">CPF</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="searchInput" placeholder="Digite para buscar...">
-                        </div>
-                        <div id="searchResults"></div>
-                    </div>
-
-                    <h3 style="margin-top: 30px;">Últimos Cadastros</h3>
-                    <div id="listaAvaliadores">
-                        <h4>Avaliadores (últimos 3)</h4>
-                        <div id="avaliadoresLista" class="lista-items"></div>
-                    </div>
-                    <div id="listaAvaliados" style="margin-top: 20px;">
-                        <h4>Avaliados (últimos 3)</h4>
-                        <div id="avaliadosLista" class="lista-items"></div>
+                    <div class="form-group">
+                        <label for="nomeAudio">Nome do Áudio:</label>
+                        <input type="text" id="nomeAudio" required>
                     </div>
                 </div>
-            </div>
 
-            <div id="tabQuestoes" class="tab-content">
-                <div class="questoes-manager">
-                    <h3>Gerenciar Questões</h3>
-                    
-                    <form id="formQuestao" style="margin-bottom: 30px;">
+                <div class="form-group">
+                    <label for="nomeAvaliador">Nome Avaliador:</label>
+                    <input type="text" id="nomeAvaliador" required autocomplete="off">
+                    <div id="autocompleteAvaliador" class="autocomplete-dropdown"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="nomeAvaliado">Nome Avaliado:</label>
+                    <input type="text" id="nomeAvaliado" required autocomplete="off">
+                    <div id="autocompleteAvaliado" class="autocomplete-dropdown"></div>
+                </div>
+
+                <div class="questions-section">
+                    <h2>Questões</h2>
+                    <div id="questionsContainer"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="observacao">Observação:</label>
+                    <textarea id="observacao" rows="4"></textarea>
+                </div>
+
+                <button type="button" id="gerarResultado" class="btn-primary">Gerar Resultado</button>
+            </form>
+
+            <div id="resultadoSection" class="resultado-section" style="display: none;">
+                <h2>Resultado da Avaliação</h2>
+                <div id="resultadoContent"></div>
+            </div>
+        </div>
+
+        <div id="modalCadastros" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="modalTitle">Cadastros</h2>
+                
+                <div id="tabPessoas" class="tab-content active">
+                    <form id="formCadastro">
                         <div class="form-group">
-                            <label for="textoQuestao">Texto da Questão:</label>
-                            <textarea id="textoQuestao" rows="3" required placeholder="Digite o texto da questão..."></textarea>
+                            <label for="tipoCadastro">Tipo:</label>
+                            <select id="tipoCadastro" required>
+                                <option value="">Selecione...</option>
+                                <option value="avaliador">Avaliador</option>
+                                <option value="avaliado">Avaliado</option>
+                            </select>
                         </div>
-                        <button type="button" id="btnAdicionarQuestao" class="btn-primary">Adicionar Questão</button>
+
+                        <div class="form-group">
+                            <label for="categoriaCadastro">Categoria:</label>
+                            <select id="categoriaCadastro" required>
+                                <option value="">Selecione...</option>
+                                <option value="militar">Militar</option>
+                                <option value="civil">Civil</option>
+                            </select>
+                        </div>
+
+                        <div id="camposMilitar" style="display: none;">
+                            <div class="form-group">
+                                <label for="postoGraduacao">Posto/Graduação:</label>
+                                <select id="postoGraduacao">
+                                    <option value="">Selecione...</option>
+                                    <option value="Cel PM">Cel PM</option>
+                                    <option value="Ten Cel PM">Ten Cel PM</option>
+                                    <option value="Maj PM">Maj PM</option>
+                                    <option value="Cap PM">Cap PM</option>
+                                    <option value="1º Ten PM">1º Ten PM</option>
+                                    <option value="2º Ten PM">2º Ten PM</option>
+                                    <option value="Asp Of PM">Asp Of PM</option>
+                                    <option value="Sub Ten PM">Sub Ten PM</option>
+                                    <option value="1º Sgt PM">1º Sgt PM</option>
+                                    <option value="2º Sgt PM">2º Sgt PM</option>
+                                    <option value="3º Sgt PM">3º Sgt PM</option>
+                                    <option value="Cb PM">Cb PM</option>
+                                    <option value="Sd PM 1ª Classe">Sd PM 1ª Classe</option>
+                                    <option value="Sd PM 2ª Classe">Sd PM 2ª Classe</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="re">RE:</label>
+                                <input type="text" id="re">
+                            </div>
+                            <div class="form-group">
+                                <label for="nomeGuerra">Nome de Guerra:</label>
+                                <input type="text" id="nomeGuerra">
+                            </div>
+                        </div>
+
+                        <div id="camposCivil" style="display: none;">
+                            <div class="form-group">
+                                <label for="cpf">CPF:</label>
+                                <input type="text" id="cpf" placeholder="000.000.000-00">
+                            </div>
+                            <div class="form-group">
+                                <label for="nomeCompleto">Nome Completo:</label>
+                                <input type="text" id="nomeCompleto">
+                            </div>
+                        </div>
+
+                        <button type="button" id="btnSalvarCadastro" class="btn-primary">Salvar Cadastro</button>
                     </form>
 
-                    <h4>Questões Cadastradas</h4>
-                    <div id="listaQuestoes" class="lista-questoes"></div>
-                </div>
-            </div>
+                    <div id="listaCadastros" style="margin-top: 30px;">
+                        <h3>Buscar Cadastros</h3>
+                        <div class="search-section">
+                            <div class="form-group">
+                                <label for="searchType">Buscar por:</label>
+                                <select id="searchType">
+                                    <option value="re">RE</option>
+                                    <option value="cpf">CPF</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="searchInput" placeholder="Digite para buscar...">
+                            </div>
+                            <div id="searchResults"></div>
+                        </div>
 
-            <div id="tabEselotex" class="tab-content">
-                <div class="eselotex-container">
-                    <h3>E-selotex - Calendário de Observações</h3>
-                    <div class="calendar-header">
-                        <button id="prevMonth" class="btn-nav-month">◀</button>
-                        <h4 id="currentMonthYear"></h4>
-                        <button id="nextMonth" class="btn-nav-month">▶</button>
-                    </div>
-                    <div id="calendar" class="calendar-grid"></div>
-                    <div class="calendar-legend">
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #4CAF50;"></span>
-                            <span>Sem observação</span>
+                        <h3 style="margin-top: 30px;">Últimos Cadastros</h3>
+                        <div id="listaAvaliadores">
+                            <h4>Avaliadores (últimos 3)</h4>
+                            <div id="avaliadoresLista" class="lista-items"></div>
                         </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #f44336;"></span>
-                            <span>Com observação</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tabEscalaObs" class="tab-content">
-                <div class="eselotex-container">
-                    <h3>Escala Obs - Calendário de Observações</h3>
-                    <div class="calendar-header">
-                        <button id="prevMonthEscala" class="btn-nav-month">◀</button>
-                        <h4 id="currentMonthYearEscala"></h4>
-                        <button id="nextMonthEscala" class="btn-nav-month">▶</button>
-                    </div>
-                    <div id="calendarEscala" class="calendar-grid"></div>
-                    <div class="calendar-legend">
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #4CAF50;"></span>
-                            <span>Sem observação</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #f44336;"></span>
-                            <span>Com observação</span>
+                        <div id="listaAvaliados" style="margin-top: 20px;">
+                            <h4>Avaliados (últimos 3)</h4>
+                            <div id="avaliadosLista" class="lista-items"></div>
                         </div>
                     </div>
                 </div>
+
+                <div id="tabQuestoes" class="tab-content">
+                    <div class="questoes-manager">
+                        <h3>Gerenciar Questões</h3>
+                        
+                        <form id="formQuestao" style="margin-bottom: 30px;">
+                            <div class="form-group">
+                                <label for="textoQuestao">Texto da Questão:</label>
+                                <textarea id="textoQuestao" rows="3" required placeholder="Digite o texto da questão..."></textarea>
+                            </div>
+                            <button type="button" id="btnAdicionarQuestao" class="btn-primary">Adicionar Questão</button>
+                        </form>
+
+                        <h4>Questões Cadastradas</h4>
+                        <div id="listaQuestoes" class="lista-questoes"></div>
+                    </div>
+                </div>
+
+                <div id="tabEselotex" class="tab-content">
+                    <div class="eselotex-container">
+                        <h3>E-selotex - Calendário de Observações</h3>
+                        <div class="calendar-header">
+                            <button id="prevMonth" class="btn-nav-month">◀</button>
+                            <h4 id="currentMonthYear"></h4>
+                            <button id="nextMonth" class="btn-nav-month">▶</button>
+                        </div>
+                        <button id="btnListarEselotex" class="btn-secondary" style="margin-bottom: 15px; width: 100%;">Listar Observações do Mês</button>
+                        <div id="calendar" class="calendar-grid"></div>
+                        <div class="calendar-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: #4CAF50;"></span>
+                                <span>Sem observação</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: #f44336;"></span>
+                                <span>Com observação</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tabEscalaObs" class="tab-content">
+                    <div class="eselotex-container">
+                        <h3>Escala Obs - Calendário de Observações</h3>
+                        <div class="calendar-header">
+                            <button id="prevMonthEscala" class="btn-nav-month">◀</button>
+                            <h4 id="currentMonthYearEscala"></h4>
+                            <button id="nextMonthEscala" class="btn-nav-month">▶</button>
+                        </div>
+                        <button id="btnListarEscalaObs" class="btn-secondary" style="margin-bottom: 15px; width: 100%;">Listar Observações do Mês</button>
+                        <div id="calendarEscala" class="calendar-grid"></div>
+                        <div class="calendar-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: #4CAF50;"></span>
+                                <span>Sem observação</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: #f44336;"></span>
+                                <span>Com observação</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="modalObservacao" class="modal">
-        <div class="modal-content modal-observacao">
-            <span class="close" id="closeObservacao">&times;</span>
-            <h2 id="observacaoTitle">Observação</h2>
-            <div class="form-group">
-                <label for="observacaoTexto">Observação do Dia:</label>
-                <textarea id="observacaoTexto" rows="6" placeholder="Digite a observação para este dia..."></textarea>
-            </div>
-            <div class="observacao-actions">
-                <button id="btnSalvarObservacao" class="btn-primary">Salvar</button>
-                <button id="btnExcluirObservacao" class="btn-delete" style="display: none;">Excluir</button>
+        <div id="modalObservacao" class="modal">
+            <div class="modal-content modal-observacao">
+                <span class="close" id="closeObservacao">&times;</span>
+                <h2 id="observacaoTitle">Observação</h2>
+                <div class="form-group">
+                    <label for="observacaoTexto">Observação do Dia:</label>
+                    <textarea id="observacaoTexto" rows="6" placeholder="Digite a observação para este dia..."></textarea>
+                </div>
+                <div class="observacao-actions">
+                    <button id="btnSalvarObservacao" class="btn-primary">Salvar</button>
+                    <button id="btnExcluirObservacao" class="btn-delete" style="display: none;">Excluir</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="modalObservacaoEscala" class="modal">
-        <div class="modal-content modal-observacao">
-            <span class="close" id="closeObservacaoEscala">&times;</span>
-            <h2 id="observacaoTitleEscala">Observação</h2>
-            <div class="form-group">
-                <label for="observacaoTextoEscala">Observação do Dia:</label>
-                <textarea id="observacaoTextoEscala" rows="6" placeholder="Digite a observação para este dia..." readonly></textarea>
-            </div>
-            <div class="observacao-actions" id="escalaObsActions">
-                <button id="btnSalvarObservacaoEscala" class="btn-primary">Salvar</button>
-                <button id="btnExcluirObservacaoEscala" class="btn-delete" style="display: none;">Excluir</button>
+        <div id="modalObservacaoEscala" class="modal">
+            <div class="modal-content modal-observacao">
+                <span class="close" id="closeObservacaoEscala">&times;</span>
+                <h2 id="observacaoTitleEscala">Observação</h2>
+                <div class="form-group">
+                    <label for="observacaoTextoEscala">Observação do Dia:</label>
+                    <textarea id="observacaoTextoEscala" rows="6" placeholder="Digite a observação para este dia..." readonly></textarea>
+                </div>
+                <div class="observacao-actions" id="escalaObsActions">
+                    <button id="btnSalvarObservacaoEscala" class="btn-primary">Salvar</button>
+                    <button id="btnExcluirObservacaoEscala" class="btn-delete" style="display: none;">Excluir</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="modalSenhaEscala" class="modal">
-        <div class="modal-content modal-observacao" style="max-width: 400px;">
-            <span class="close" id="closeSenhaEscala">&times;</span>
-            <h2>Autenticação Necessária</h2>
-            <div class="form-group">
-                <label for="senhaEscala">Digite a senha para editar:</label>
-                <input type="password" id="senhaEscala" placeholder="Digite a senha">
-            </div>
-            <div class="observacao-actions">
-                <button id="btnConfirmarSenha" class="btn-primary">Confirmar</button>
-                <button id="btnCancelarSenha" class="btn-cancel">Cancelar</button>
+        <div id="modalSenhaEscala" class="modal">
+            <div class="modal-content modal-observacao" style="max-width: 400px;">
+                <span class="close" id="closeSenhaEscala">&times;</span>
+                <h2>Autenticação Necessária</h2>
+                <div class="form-group">
+                    <label for="senhaEscala">Digite a senha para editar:</label>
+                    <input type="password" id="senhaEscala" placeholder="Digite a senha">
+                </div>
+                <div class="observacao-actions">
+                    <button id="btnConfirmarSenha" class="btn-primary">Confirmar</button>
+                    <button id="btnCancelarSenha" class="btn-cancel">Cancelar</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <script type="module" src="script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <div id="modalListaObservacoes" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeListaObservacoes">&times;</span>
+                <h2 id="tituloListaObservacoes">Observações do Mês</h2>
+                <div class="resultado-acoes" style="margin-bottom: 20px;">
+                    <button class="btn-download" onclick="baixarListaObservacoesPDF()">📥 Baixar PDF</button>
+                    <button class="btn-email" onclick="compartilharListaObservacoes('email')">📧 Email</button>
+                    <button class="btn-primary" onclick="compartilharListaObservacoes('whatsapp')">📱 WhatsApp</button>
+                </div>
+                <div id="conteudoListaObservacoes" class="lista-observacoes-mes"></div>
+            </div>
+        </div>
+
+        <script type="module" src="script.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    </div>
 </body>
 </html>
