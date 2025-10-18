@@ -3,6 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
+// Firebase configuration - works both locally and when hosted
 const firebaseConfig = {
   apiKey: "AIzaSyCgNRIVJw3ys5kNrCCOMV-GP4JyTtGmBgo",
   authDomain: "monitoria-bcc25.firebaseapp.com",

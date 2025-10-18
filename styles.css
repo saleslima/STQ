@@ -1,3 +1,6 @@
+/* Ensure fonts load properly when hosted */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap');
+
 :root {
     --bg-primary: #f5f5f5;
     --bg-secondary: #ffffff;
