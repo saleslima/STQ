@@ -452,45 +452,9 @@ window.enviarEmail = function() {
     window.location.href = mailtoLink;
 }
 
-// Senha para acesso ao sistema
-const SENHA_SISTEMA = 'mystq';
-
 // Inicializar
 document.addEventListener('DOMContentLoaded', function() {
-    // Verificar se já está autenticado
-    const isAuthenticated = sessionStorage.getItem('authenticated') === 'true';
-    
-    if (isAuthenticated) {
-        mostrarAplicacao();
-    } else {
-        mostrarTelaLogin();
-    }
-    
-    // Event listener para login
-    const btnLogin = document.getElementById('btnLogin');
-    const loginPassword = document.getElementById('loginPassword');
-    
-    btnLogin.addEventListener('click', verificarSenhaLogin);
-    
-    loginPassword.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            verificarSenhaLogin();
-        }
-    });
-});
-
-function mostrarTelaLogin() {
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('mainApp').style.display = 'none';
-    document.getElementById('loginPassword').focus();
-}
-
-function mostrarAplicacao() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-    
-    // Inicializar todos os componentes
-    carregarQuestoesFirebase();
+    carregarQuestoesFirebase(); // Carregar questões antes de renderizar
     
     document.getElementById('gerarResultado').addEventListener('click', calcularResultado);
     
@@ -520,22 +484,7 @@ function mostrarAplicacao() {
     
     // Inicializar E-selotex
     initEselotex();
-}
-
-function verificarSenhaLogin() {
-    const senhaDigitada = document.getElementById('loginPassword').value;
-    const loginError = document.getElementById('loginError');
-    
-    if (senhaDigitada === SENHA_SISTEMA) {
-        sessionStorage.setItem('authenticated', 'true');
-        loginError.textContent = '';
-        mostrarAplicacao();
-    } else {
-        loginError.textContent = 'Senha incorreta! Tente novamente.';
-        document.getElementById('loginPassword').value = '';
-        document.getElementById('loginPassword').focus();
-    }
-}
+});
 
 // Dark Mode
 function initDarkMode() {
